@@ -1,0 +1,540 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Calculadora de Importación — Argentina FOB Miami</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Sora:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#080f1e;--bg2:#0c1527;--card:#0f1e38;--card2:#142244;
+  --b:rgba(255,255,255,.07);--b2:rgba(255,255,255,.13);--b3:rgba(255,255,255,.2);
+  --blue:#2d5be3;--bp:#4a74f5;--bglow:rgba(61,110,245,.12);
+  --w:#fff;--w90:rgba(255,255,255,.9);--w70:rgba(255,255,255,.7);
+  --w50:rgba(255,255,255,.5);--w30:rgba(255,255,255,.3);--w15:rgba(255,255,255,.15);--w08:rgba(255,255,255,.08);
+  --grn:#10b981;--grbg:rgba(16,185,129,.1);--grb:rgba(16,185,129,.25);
+  --amb:#f59e0b;--abg:rgba(245,158,11,.1);--ab:rgba(245,158,11,.25);
+  --red:#f43f5e;--rbg:rgba(244,63,94,.1);--rb:rgba(244,63,94,.28);
+  --pur:#a855f7;--pbg:rgba(168,85,247,.1);--pb:rgba(168,85,247,.25);
+}
+html,body{min-height:100%;font-family:'Sora',sans-serif;background:var(--bg);color:var(--w);font-size:13px;-webkit-font-smoothing:antialiased}
+.topbar{background:var(--bg2);border-bottom:1px solid var(--b);padding:0 32px;height:54px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:100}
+.logo{display:flex;align-items:center;gap:9px}
+.tri{width:0;height:0;border-top:8px solid transparent;border-bottom:8px solid transparent;border-left:14px solid var(--bp)}
+.logo-name{font-size:17px;font-weight:800;letter-spacing:.05em}
+.logo-sub{font-size:10px;color:var(--w30);margin-left:12px;letter-spacing:.04em}
+.topbar-right{display:flex;gap:8px;align-items:center}
+.tbtn{border:1px solid var(--b2);border-radius:7px;padding:6px 14px;font-size:11px;font-weight:600;cursor:pointer;font-family:'Sora',sans-serif;background:transparent;color:var(--w70);transition:all .2s}
+.tbtn:hover{border-color:var(--b3);color:var(--w)}
+.tbtn.pri{background:var(--blue);border-color:var(--blue);color:#fff}
+.tbtn.pri:hover{background:var(--bp)}
+.tbtn.cat-open{background:var(--card2);border-color:var(--bp);color:var(--bp)}
+.page{max-width:1100px;margin:0 auto;padding:32px 32px 60px}
+.hero{margin-bottom:28px}
+.hero h1{font-size:28px;font-weight:800;letter-spacing:-.8px;margin-bottom:6px}
+.hero h1 span{color:var(--bp)}
+.hero p{font-size:13px;color:var(--w50);line-height:1.65;max-width:580px}
+.config-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:24px}
+.cfg{background:var(--card);border:1px solid var(--b);border-radius:10px;padding:14px 16px}
+.cfg-title{font-size:9px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--w30);margin-bottom:12px;display:flex;align-items:center;gap:6px}
+.cfg-row{display:flex;align-items:center;justify-content:space-between;margin-bottom:8px}
+.cfg-row:last-child{margin-bottom:0}
+.cfg-label{font-size:11px;color:var(--w50)}
+.cfg-input-wrap{position:relative;display:flex;align-items:center}
+.cfg-prefix{position:absolute;left:8px;font-size:11px;color:var(--w30);font-family:'DM Mono',monospace;pointer-events:none;z-index:1}
+.cfg-suffix{position:absolute;right:8px;font-size:10px;color:var(--w30);pointer-events:none}
+.cfg-in{background:var(--bg);border:1.5px solid var(--b2);border-radius:6px;padding:5px 8px 5px 20px;color:var(--w);font-size:12px;font-weight:600;font-family:'DM Mono',monospace;outline:none;width:90px;text-align:right;transition:border-color .2s}
+.cfg-in.no-pre{padding-left:9px}
+.cfg-in.with-suf{padding-right:22px}
+.cfg-in:focus{border-color:var(--bp)}
+.cfg-derived{font-family:'DM Mono',monospace;font-size:11px;color:var(--bp);font-weight:500}
+.cfg-note{font-size:9px;color:var(--w30);margin-top:9px;padding-top:8px;border-top:1px solid var(--b);line-height:1.5}
+.cfg-note b{color:var(--w50)}
+.cat-panel{background:var(--card);border:1px solid var(--b2);border-radius:10px;margin-bottom:20px;overflow:hidden;display:none}
+.cat-panel-head{padding:12px 16px;border-bottom:1px solid var(--b);background:var(--bg2);display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.cat-panel-label{font-size:11px;font-weight:700;color:var(--w70);letter-spacing:.06em;text-transform:uppercase;flex-shrink:0}
+.cat-search{flex:1;min-width:180px;background:var(--bg);border:1.5px solid var(--b2);border-radius:7px;padding:6px 12px;color:var(--w);font-size:12px;font-family:'Sora',sans-serif;outline:none}
+.cat-search:focus{border-color:var(--bp)}
+.cat-load-all{background:var(--blue);border:none;border-radius:7px;padding:6px 14px;color:#fff;font-size:11px;font-weight:600;cursor:pointer;font-family:'Sora',sans-serif;white-space:nowrap}
+.cat-load-all:hover{background:var(--bp)}
+.cat-list{max-height:300px;overflow-y:auto}
+.cat-item{display:flex;align-items:center;gap:10px;padding:8px 14px;border-bottom:1px solid rgba(255,255,255,.04);cursor:pointer;transition:background .1s}
+.cat-item:hover{background:var(--w08)}
+.cat-item:last-child{border-bottom:none}
+.cat-item-info{flex:1;min-width:0}
+.cat-item-name{font-size:11px;font-weight:600;color:var(--w90);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.cat-item-meta{font-size:9px;color:var(--w30);margin-top:1px}
+.cat-item-fob{font-family:'DM Mono',monospace;font-size:13px;font-weight:700;color:var(--bp);flex-shrink:0}
+.cat-item-qty{font-size:10px;color:var(--w30);flex-shrink:0;text-align:right}
+.cat-empty{padding:24px;text-align:center;font-size:12px;color:var(--w30)}
+.section-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px}
+.section-title{font-size:11px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--w50)}
+.add-btn{display:flex;align-items:center;gap:6px;background:var(--card);border:1px solid var(--b2);border-radius:7px;padding:7px 14px;color:var(--w70);font-size:11px;font-weight:600;cursor:pointer;font-family:'Sora',sans-serif;transition:all .2s}
+.add-btn:hover{background:var(--card2);color:var(--w)}
+.products-table{width:100%;border-collapse:collapse;background:var(--card);border-radius:10px;overflow:hidden;border:1px solid var(--b);margin-bottom:8px}
+.pt thead th{background:var(--bg2);font-size:9px;font-weight:600;letter-spacing:.09em;text-transform:uppercase;color:var(--w30);padding:9px 12px;text-align:left;border-bottom:1px solid var(--b)}
+.pt thead th.r{text-align:right}.pt thead th.c{text-align:center}
+.pt tbody tr{border-bottom:1px solid rgba(255,255,255,.05)}
+.pt tbody tr:last-child{border-bottom:none}
+.pt tbody td{padding:10px 12px;vertical-align:middle}
+.pt tbody td.r{text-align:right}.pt tbody td.c{text-align:center}
+.ti{background:var(--bg);border:1.5px solid var(--b2);border-radius:6px;padding:6px 9px;color:var(--w);font-size:12px;font-weight:500;font-family:'Sora',sans-serif;outline:none;transition:border-color .2s;width:100%}
+.ti:focus{border-color:var(--bp)}
+.ti.mono{font-family:'DM Mono',monospace;font-weight:600}
+.duty-sel{background:var(--bg);border:1.5px solid var(--b2);border-radius:6px;padding:6px 8px;color:var(--w70);font-size:11px;font-family:'Sora',sans-serif;outline:none;width:100px;cursor:pointer}
+.duty-sel option{background:var(--card)}
+.mn{font-family:'DM Mono',monospace;font-weight:600;font-size:12px}
+.mn.g{color:var(--grn)}.mn.b{color:var(--bp)}.mn.a{color:var(--amb)}.mn.r{color:var(--red)}.mn.w{color:var(--w90)}
+.sub{font-size:9px;color:var(--w30);margin-top:1px;font-family:'DM Mono',monospace}
+.del-btn{width:26px;height:26px;background:transparent;border:1px solid var(--b2);border-radius:6px;color:var(--w30);font-size:14px;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .2s;flex-shrink:0}
+.del-btn:hover{background:var(--rbg);border-color:var(--rb);color:var(--red)}
+.breakdown-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(320px,1fr));gap:12px;margin-top:24px}
+.bk-card{background:var(--card);border:1px solid var(--b);border-radius:10px;overflow:hidden}
+.bk-head{padding:12px 16px;border-bottom:1px solid var(--b);background:var(--bg2);display:flex;justify-content:space-between;align-items:flex-start}
+.bk-title{font-size:12px;font-weight:600;color:var(--w90);margin-bottom:2px}
+.bk-sku{font-size:10px;color:var(--w30);font-family:'DM Mono',monospace}
+.bk-body{padding:12px 16px}
+.bk-row{display:flex;align-items:center;gap:8px;padding:6px 0;border-bottom:1px solid rgba(255,255,255,.04)}
+.bk-row:last-child{border-bottom:none}
+.bk-bar-wrap{flex:1;height:4px;background:var(--b2);border-radius:2px;overflow:hidden}
+.bk-bar{height:100%;border-radius:2px}
+.bk-label{font-size:10px;color:var(--w50);min-width:150px}
+.bk-label b{font-weight:500;color:var(--w90)}
+.bk-amt{font-size:11px;font-weight:600;font-family:'DM Mono',monospace;min-width:58px;text-align:right;flex-shrink:0}
+.tag{font-size:9px;padding:1px 6px;border-radius:10px;white-space:nowrap;flex-shrink:0}
+.tag-nr{background:var(--rbg);color:var(--red);border:1px solid var(--rb)}
+.tag-rec{background:var(--grbg);color:var(--grn);border:1px solid var(--grb)}
+.tag-log{background:var(--w08);color:var(--w50);border:1px solid var(--b2)}
+.bk-total{background:var(--bglow);border:1px solid rgba(61,110,245,.2);border-radius:8px;padding:10px 14px;margin-top:10px;display:flex;flex-direction:column;gap:6px}
+.bk-total-row{display:flex;justify-content:space-between;align-items:baseline}
+.bk-total-row .tl{font-size:10px;color:var(--w50)}
+.bk-total-row .tv{font-family:'DM Mono',monospace;font-size:12px;font-weight:700}
+.bk-total-row.main .tl{font-size:12px;font-weight:600;color:var(--w90)}
+.bk-total-row.main .tv{font-size:18px;color:var(--bp)}
+.bk-margin{margin-top:10px;background:var(--card2);border-radius:8px;padding:10px 12px}
+.bk-margin .ml{font-size:9px;color:var(--w30);letter-spacing:.08em;text-transform:uppercase;margin-bottom:6px}
+.mg-scenarios{display:flex;gap:6px;flex-wrap:wrap}
+.mg-sc{text-align:center;flex:1;min-width:52px}
+.mg-sc .ms-pct{font-size:11px;font-weight:500;font-family:'DM Mono',monospace;color:var(--w70)}
+.mg-sc .ms-price{font-size:12px;font-weight:700;font-family:'DM Mono',monospace;color:var(--bp);margin-top:1px}
+.mg-sc.rec .ms-pct{color:var(--grn)}
+.mg-sc.rec .ms-price{color:var(--grn)}
+.totals-wrap{background:var(--card2);border:1px solid rgba(61,110,245,.2);border-radius:12px;overflow:hidden;margin-top:24px}
+.totals-head{background:var(--blue);padding:14px 20px;display:flex;align-items:center;justify-content:space-between}
+.totals-head span{font-size:12px;font-weight:700;color:#fff;letter-spacing:.04em}
+.totals-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:1px;background:var(--b)}
+.tot{background:var(--card2);padding:14px 16px}
+.tot .tl{font-size:9px;font-weight:600;letter-spacing:.09em;text-transform:uppercase;color:var(--w30);margin-bottom:5px}
+.tot .tv{font-size:18px;font-weight:800;font-family:'DM Mono',monospace;letter-spacing:-.5px}
+.tot .ts{font-size:9px;color:var(--w30);margin-top:2px}
+.empty{text-align:center;padding:48px 20px;color:var(--w30)}
+.empty .ei{font-size:36px;opacity:.3;margin-bottom:12px}
+@media print{
+  .topbar,.add-btn,.del-btn,.tbtn,.cfg-in,.ti,.duty-sel,.cat-panel{display:none!important}
+  .topbar{position:static}
+  body{background:#fff;color:#111}
+  .page{padding:20px}
+}
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <div style="display:flex;align-items:center">
+    <div class="logo"><div class="tri"></div><div class="logo-name">RIVERO</div></div>
+    <span class="logo-sub">Calculadora de Importación · FOB Miami → Argentina · Jun 15, 2026</span>
+  </div>
+  <div class="topbar-right">
+    <button class="tbtn" onclick="clearAll()">Limpiar todo</button>
+    <button class="tbtn" id="cat-btn" onclick="toggleCatalog()">📦 Cargar desde catálogo</button>
+    <button class="tbtn" onclick="addProduct()">+ Producto manual</button>
+    <button class="tbtn pri" onclick="window.print()">⬇ Exportar PDF</button>
+  </div>
+</div>
+
+<div class="page">
+
+  <div class="hero">
+    <h1>¿Cuánto cuesta traer tu<br>mercadería a <span>Argentina</span>?</h1>
+    <p>Ingresá el precio FOB Miami y calculamos el costo total puesto en puerto, nacionalizado y listo para retirar — con todos los impuestos argentinos incluidos.</p>
+  </div>
+
+  <div class="config-grid">
+    <div class="cfg">
+      <div class="cfg-title"><span>🚢</span> Flete marítimo · Miami → Bs. Aires</div>
+      <div class="cfg-row"><span class="cfg-label">Contenedor 40ft (USD)</span>
+        <div class="cfg-input-wrap"><span class="cfg-prefix">$</span><input class="cfg-in" type="number" id="c-cont" value="4500" min="0" step="100" oninput="recalc()"></div></div>
+      <div class="cfg-row"><span class="cfg-label">Unidades por contenedor</span>
+        <input class="cfg-in no-pre" type="number" id="c-units" value="500" min="1" step="10" oninput="recalc()"></div>
+      <div class="cfg-row"><span class="cfg-label">Flete por unidad</span><span class="cfg-derived" id="c-fpu">$9.00</span></div>
+      <div class="cfg-note">Para productos grandes (cocinas, ventiladores) usá 50–150 uds. Para items pequeños, 400–600.</div>
+    </div>
+    <div class="cfg">
+      <div class="cfg-title">🏛 Puerto · Aduana · Gastos fijos</div>
+      <div class="cfg-row"><span class="cfg-label">THC / Gastos portuarios</span>
+        <div class="cfg-input-wrap"><span class="cfg-prefix">$</span><input class="cfg-in" type="number" id="c-thc" value="280" min="0" step="10" oninput="recalc()"></div></div>
+      <div class="cfg-row"><span class="cfg-label">Despachante de aduana</span>
+        <div class="cfg-input-wrap"><span class="cfg-suffix">%</span><input class="cfg-in with-suf no-pre" type="number" id="c-broker" value="1.5" min="0" step="0.1" oninput="recalc()"></div></div>
+      <div class="cfg-row"><span class="cfg-label">Almacenaje (días)</span>
+        <input class="cfg-in no-pre" type="number" id="c-storage-days" value="5" min="0" oninput="recalc()"></div>
+      <div class="cfg-row"><span class="cfg-label">Tarifa almacenaje diaria</span>
+        <div class="cfg-input-wrap"><span class="cfg-prefix">$</span><input class="cfg-in" type="number" id="c-storage-rate" value="60" min="0" step="10" oninput="recalc()"></div></div>
+      <div class="cfg-note">THC default <b>$280</b> para Buenos Aires. Los primeros días hábiles suelen ser libres.</div>
+    </div>
+    <div class="cfg">
+      <div class="cfg-title">🚛 Transporte final · Puerto → Comercio</div>
+      <div class="cfg-row"><span class="cfg-label">Incluir transporte final</span>
+        <label style="display:flex;align-items:center;gap:6px;cursor:pointer">
+          <input type="checkbox" id="c-transport-on" onchange="recalc()" style="accent-color:var(--blue);width:14px;height:14px;">
+          <span style="font-size:11px;color:var(--w50)">Sí, calcular</span>
+        </label></div>
+      <div class="cfg-row"><span class="cfg-label">Costo por contenedor</span>
+        <div class="cfg-input-wrap"><span class="cfg-prefix">$</span><input class="cfg-in" type="number" id="c-transport" value="350" min="0" step="50" oninput="recalc()"></div></div>
+      <div class="cfg-row"><span class="cfg-label">Seguro sobre FOB</span>
+        <div class="cfg-input-wrap"><span class="cfg-suffix">%</span><input class="cfg-in with-suf no-pre" type="number" id="c-seg" value="0.5" min="0" step="0.1" oninput="recalc()"></div></div>
+      <div class="cfg-row"><span class="cfg-label">Margen objetivo</span>
+        <div class="cfg-input-wrap"><span class="cfg-suffix">%</span><input class="cfg-in with-suf no-pre" type="number" id="c-margin" value="35" min="1" max="90" step="1" oninput="recalc()"></div></div>
+      <div class="cfg-note">El margen se calcula sobre el precio de venta. Ajustá según tu canal.</div>
+    </div>
+  </div>
+
+  <!-- CATALOG PANEL -->
+  <div class="cat-panel" id="cat-panel">
+    <div class="cat-panel-head">
+      <span class="cat-panel-label">📦 Catálogo Rivero — 152 SKUs · Jun 15, 2026</span>
+      <input class="cat-search" type="text" id="cat-search" placeholder="Buscar por nombre, SKU o categoría..." oninput="filterCatalog()">
+      <button class="cat-load-all" onclick="loadAllVisible()">+ Agregar visibles</button>
+    </div>
+    <div class="cat-list" id="cat-list"></div>
+  </div>
+
+  <!-- PRODUCTS -->
+  <div class="section-head">
+    <span class="section-title">Productos a importar</span>
+    <button class="add-btn" onclick="addProduct()">
+      <svg width="12" height="12" viewBox="0 0 12 12" fill="none"><path d="M6 1v10M1 6h10" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
+      Agregar manualmente
+    </button>
+  </div>
+
+  <table class="products-table pt">
+    <thead>
+      <tr>
+        <th style="width:28%">Nombre del producto</th>
+        <th class="c" style="width:10%">SKU</th>
+        <th class="r" style="width:9%">FOB / u</th>
+        <th class="c" style="width:6%">Cant.</th>
+        <th class="c" style="width:14%">Arancel DI</th>
+        <th class="r" style="width:10%">CIF / u</th>
+        <th class="r" style="width:11%">Aterrizado / u</th>
+        <th class="r" style="width:8%">Total</th>
+        <th style="width:4%"></th>
+      </tr>
+    </thead>
+    <tbody id="product-rows"></tbody>
+  </table>
+
+  <div id="empty-msg" class="empty">
+    <div class="ei">📦</div>
+    <p>Usá <strong>"📦 Cargar desde catálogo"</strong> para seleccionar SKUs del inventario Rivero,<br>o <strong>"+ Producto manual"</strong> para ingresar tu propio producto.</p>
+  </div>
+
+  <div class="breakdown-grid" id="breakdown-grid"></div>
+
+  <div class="totals-wrap" id="totals-wrap" style="display:none">
+    <div class="totals-head">
+      <span>Resumen total de la operación</span>
+      <span id="tot-products" style="font-size:11px;font-weight:400;opacity:.7"></span>
+    </div>
+    <div class="totals-grid">
+      <div class="tot"><div class="tl">Total FOB Miami</div><div class="tv" id="tot-fob" style="color:var(--w90)">$0</div><div class="ts">precio de origen</div></div>
+      <div class="tot"><div class="tl">Flete + seguro</div><div class="tv" id="tot-freight" style="color:var(--w50)">$0</div><div class="ts">logística marítima</div></div>
+      <div class="tot"><div class="tl">Impuestos ARG</div><div class="tv" id="tot-taxes" style="color:var(--red)">$0</div><div class="ts">aranceles + IVA + tasas</div></div>
+      <div class="tot"><div class="tl">Total puesto en puerto</div><div class="tv" id="tot-landed" style="color:var(--bp)">$0</div><div class="ts">listo para retirar</div></div>
+      <div class="tot"><div class="tl">Costo real permanente</div><div class="tv" id="tot-nr" style="color:var(--amb)">$0</div><div class="ts">sin recuperables</div></div>
+    </div>
+  </div>
+
+</div>
+
+<script>
+// ── DATA — declared first, no dependencies ──
+const CATALOG = [{"sku": "1010043641", "title": "32 in. Undermount Single Bowl 18-Gauge Gold Stainless Steel Workstatio", "cat": "Undermount Kitchen Sinks", "qty": 2, "fob": 90.0, "retail": 440.0, "comp_fob": 72.86}, {"sku": "1007590129", "title": "5 in. Mini Portable Personal Octopus Clip on Fan in Green", "cat": "Heating, Venting & Cooling", "qty": 315, "fob": 2.0, "retail": 14.95, "comp_fob": 1.62}, {"sku": "1004410434", "title": "Medium Arched Gold Classic Accent Mirror 35\" h x 24\" w", "cat": "Mirrors", "qty": 2, "fob": 28.0, "retail": 189.0, "comp_fob": 22.67}, {"sku": "1001547402", "title": "24 in. W x 24 in. H Round Frameless Wall Bathroom Vanity Mirror in Sil", "cat": "Vanity Mirrors", "qty": 77, "fob": 28.0, "retail": 159.0, "comp_fob": 22.67}, {"sku": "1003566836", "title": "Designer 12 inch Rough In Two-Piece 1.28 GPF Single Flush Round Toilet", "cat": "Two Piece Toilets", "qty": 25, "fob": 45.0, "retail": 194.0, "comp_fob": 36.43}, {"sku": "1004486549", "title": "Mix and Match Steel Padded Sling Folding Outdoor Patio Dining Chair in", "cat": "Outdoor Dining Chairs", "qty": 3, "fob": 32.0, "retail": 129.0, "comp_fob": 25.91}, {"sku": "1005806120", "title": "Baywood 52\" Outdoor Ceiling Fan", "cat": "Ceiling Fans", "qty": 1, "fob": 35.0, "retail": 139.0, "comp_fob": 28.34}, {"sku": "1007590131", "title": "5 in. Mini Portable Personal Octopus Clip on Fan in White", "cat": "Heating, Venting & Cooling", "qty": 60, "fob": 2.0, "retail": 14.95, "comp_fob": 1.62}, {"sku": "1007508513", "title": "5 in. Mini Portable Personal Octopus Clip on Fan in Black", "cat": "Heating, Venting & Cooling", "qty": 240, "fob": 2.0, "retail": 14.95, "comp_fob": 1.62}, {"sku": "165474", "title": "Glendale 52 in. LED Indoor Brushed Nickel Ceiling Fan with Light Kit", "cat": "Ceiling Fans", "qty": 1, "fob": 26.0, "retail": 106.68, "comp_fob": 21.05}, {"sku": "1005711193", "title": "Milbourne 60 in. Integrated LED Indoor Espresso Bronze Ceiling Fan wit", "cat": "Ceiling Fans", "qty": 1, "fob": 52.0, "retail": 208.66, "comp_fob": 42.1}, {"sku": "1005170314", "title": "Mercer 52 in. Integrated LED Indoor Matte Black Ceiling Fan with Light", "cat": "Ceiling Fans", "qty": 3, "fob": 42.0, "retail": 169.0, "comp_fob": 34.0}, {"sku": "1001547403", "title": "Glacier Bay 20 in. W x 28 in. H Rectangular Framed Wall Bathroom Vanit", "cat": "Vanity Mirrors", "qty": 39, "fob": 25.0, "retail": 164.0, "comp_fob": 20.24}, {"sku": "1005795374", "title": "Claret 52 in. Indoor Brushed Nickel Ceiling Fan with Light Kit", "cat": "Ceiling Fans With Lights", "qty": 2, "fob": 29.0, "retail": 115.0, "comp_fob": 23.48}, {"sku": "1006844921", "title": "Genevieve 4 ft. Gray Adjustable Closet Organizer Shoe Rack", "cat": "Wire Closet Organizers", "qty": 389, "fob": 5.0, "retail": 37.79, "comp_fob": 4.05}, {"sku": "1008024442", "title": "Juno 18 in. W x 6 in. D x 49 in. H Black Wall Mount Bathroom Storage W", "cat": "Bathroom Wall Cabinets", "qty": 134, "fob": 40.0, "retail": 251.0, "comp_fob": 32.38}, {"sku": "1006841140", "title": "Genevieve 2 ft. Birch Adjustable Closet Organizer Shoe Rack (2PK)", "cat": "Wire Closet Organizers", "qty": 456, "fob": 6.0, "retail": 42.83, "comp_fob": 4.86}, {"sku": "1006841181", "title": "Genevieve 2 ft. Adjustable Closet Organizer Single Shelf Extension", "cat": "Wire Closet Organizers", "qty": 144, "fob": 4.0, "retail": 32.04, "comp_fob": 3.24}, {"sku": "1012029952", "title": "Low-Voltage 200-Watt  Landscape Lighting Transformer with Dusk to Dawn", "cat": "Landscape Lighting", "qty": 34500, "fob": 10.0, "retail": 98.97, "comp_fob": 8.1}, {"sku": "1006844911", "title": "Genevieve 4 ft. Birch Adjustable Closet Organizer Shoe Rack", "cat": "Wire Closet Systems", "qty": 7, "fob": 7.0, "retail": 48.67, "comp_fob": 5.67}, {"sku": "721404009580", "title": "20 x 36 x 1 Allergen Plus Pleated MERV 11 - FPR 7 Air Filter", "cat": "Air Filters", "qty": 163, "fob": 1.0, "retail": 4.97, "comp_fob": 0.81}, {"sku": "1011876411", "title": "Farrington 42 in. x 1 1/4 in. Decorative Grab Bar in Polished Stainles", "cat": "Bathroom Safety", "qty": 30, "fob": 5.0, "retail": 34.02, "comp_fob": 4.05}, {"sku": "1009938665", "title": "10.25in. 1LT Matte Black Wall Sconce", "cat": "Lighting", "qty": 200, "fob": 15.0, "retail": 99.97, "comp_fob": 12.14}, {"sku": "1009427307", "title": "Harper Hills 14 in. 1-Light Black Outdoor Hanging Light Pendant Light ", "cat": "Outdoor Hanging Lights", "qty": 228, "fob": 10.0, "retail": 65.7, "comp_fob": 8.1}, {"sku": "1009938661", "title": "Penzien 6.125 in. 1-Light LED Aged Brass Wall Sconce", "cat": "Wall Sconces", "qty": 190, "fob": 11.0, "retail": 80.97, "comp_fob": 8.91}, {"sku": "1009938651", "title": "Penzien 6.125 in. 1-Light LED Matte Black Wall Sconce", "cat": "Wall Sconces", "qty": 191, "fob": 11.0, "retail": 72.97, "comp_fob": 8.91}, {"sku": "1007782347", "title": "Genevieve Birch 1-Tier Plastic and Steel Closet Organization Shoe Rack", "cat": "Shelving", "qty": 416, "fob": 7.0, "retail": 50.25, "comp_fob": 5.67}, {"sku": "1008958490", "title": "Birmingham 35-Watt Matte Black Integrated LED Pendant", "cat": "Outdoor Hanging Lights", "qty": 64, "fob": 20.0, "retail": 126.0, "comp_fob": 16.19}, {"sku": "1009938626", "title": "Iler 6.125 in. 1-Light Aged Brass Wall Sconce with Clear Glass Shade", "cat": "Wall Sconces", "qty": 150, "fob": 10.0, "retail": 61.97, "comp_fob": 8.1}, {"sku": "642238", "title": "38.3 in. Steel Handle Plastic Snow Shovel", "cat": "Snow Removal Equipment", "qty": 14, "fob": 4.0, "retail": 22.98, "comp_fob": 3.24}, {"sku": "1008578296", "title": "Margrave 25 in. 2-Light Matte Black Table Lamp with Tiffany Shade", "cat": "Table Lamps", "qty": 128, "fob": 47.0, "retail": 239.0, "comp_fob": 38.05}, {"sku": "1008813404", "title": "Huntmoor 60-Watt 4-Light Matte Black Minimalist Pendant Light with Etc", "cat": "Pendant Lights", "qty": 72, "fob": 20.0, "retail": 120.02, "comp_fob": 16.19}, {"sku": "1005563641", "title": "41 in 16-Drawer Tool Chest And Cabinet Set ( Bottom Half Only )", "cat": "Tool Storage", "qty": 5, "fob": 150.0, "retail": 349.0, "comp_fob": 121.44}, {"sku": "1014393599", "title": "4.9 ft. Artificial Autumn Ficus Tree in White Pot", "cat": "Artificial Trees", "qty": 26, "fob": 12.0, "retail": 76.3, "comp_fob": 9.71}, {"sku": "1006925020", "title": "Cherry Premium 8 in. BBQ Smoking Cooking Wood Splits for Smoking, Gril", "cat": "Grilling Fuels", "qty": 18, "fob": 30.0, "retail": 150.34, "comp_fob": 24.29}, {"sku": "1008393017", "title": "Sessions 5-Light Black Tiered Pendant Rattan", "cat": "Pendant Lights", "qty": 22, "fob": 32.0, "retail": 209.0, "comp_fob": 25.91}, {"sku": "1009938550", "title": "Garay 13 in. 1-Light Aged Brass, Matte Black Accent Wall Sconce", "cat": "Lighting", "qty": 60, "fob": 10.0, "retail": 66.97, "comp_fob": 8.1}, {"sku": "1006844935", "title": "Genevieve 4 ft. Adjustable Closet Organizer Single Shelf", "cat": "Wire Closet Organizers", "qty": 176, "fob": 10.0, "retail": 69.3, "comp_fob": 8.1}, {"sku": "1009181158", "title": "3LT/3 Shade Pendant aged brass, white inside", "cat": "Lighting", "qty": 48, "fob": 15.0, "retail": 103.0, "comp_fob": 12.14}, {"sku": "1008341378", "title": "950W Equivalent Integrated LED Bronze Outdoor High Output Flood Light,", "cat": "Floodlights", "qty": 65, "fob": 25.0, "retail": 149.0, "comp_fob": 20.24}, {"sku": "1008813403", "title": "Huntmoor 60-Watt 4-Light Old Satin Brass Industrial Pendant Light with", "cat": "Pendant Lights", "qty": 84, "fob": 15.0, "retail": 109.0, "comp_fob": 12.14}, {"sku": "1006435242", "title": "Ruby Red 18.9 in. Round Metal Outdoor Patio Garden Stool", "cat": "Patio Tables", "qty": 47, "fob": 15.0, "retail": 59.98, "comp_fob": 12.14}, {"sku": "1009938585", "title": "Home Decorator Collection 11in 1LT Aged Brass Wall Sconces", "cat": "Lighting", "qty": 116, "fob": 7.5, "retail": 49.98, "comp_fob": 6.07}, {"sku": "1005605085", "title": "Mix and Match Folding Wicker Outdoor Patio Dining Chair in Black and W", "cat": "Patio Furniture", "qty": 40, "fob": 13.0, "retail": 54.98, "comp_fob": 10.52}, {"sku": "1005878896", "title": "4 ft. x 16 in. Fixed Rod Wire Shelf", "cat": "Wire Closet Shelves", "qty": 72, "fob": 1.0, "retail": 5.88, "comp_fob": 0.81}, {"sku": "1007136207", "title": "Swirl Mini 8.9 in. 1-Light Chrome Modern Dimmable Integrated LED 3 CCT", "cat": "Wall Sconces", "qty": 7, "fob": 14.0, "retail": 89.97, "comp_fob": 11.33}, {"sku": "1004018390", "title": "Echo 233 MPH 651 CFM 63.3cc Gas 2-Stroke Backpack Leaf Blower (PB-755S", "cat": "Gas Leaf Blowers", "qty": 2, "fob": 274.0, "retail": 499.0, "comp_fob": 221.82}, {"sku": "51624", "title": "725 CFM PowerJet Corded Electric Leaf Blower", "cat": "Outdoors", "qty": 4, "fob": 35.0, "retail": 89.99, "comp_fob": 28.34}, {"sku": "PCLST01B", "title": "Ryobi ONE+ 18V 10 in. Cordless Battery String Trimmer/Edger (Tool Only", "cat": "Outdoor Power Equipment", "qty": 12, "fob": 20.0, "retail": 59.0, "comp_fob": 16.19}, {"sku": "1005648306", "title": "6.5 ft. x 10 ft. Aluminum Market Tilt Patio Umbrella in Riverbed", "cat": "Patio Umbrellas", "qty": 6, "fob": 40.0, "retail": 149.0, "comp_fob": 32.38}, {"sku": "043765022139", "title": "Vornado Velocity 5 Whole Room Space Heater, Electric, 250 sq ft", "cat": "Appliances", "qty": 1, "fob": 36.0, "retail": 119.98, "comp_fob": 29.14}, {"sku": "1004528959", "title": "28 in. - 48 in. Tension Curtain Rod in White", "cat": "Window Treatments", "qty": 1206, "fob": 1.0, "retail": 7.4, "comp_fob": 0.81}, {"sku": "1006314480", "title": "Stratton 10-Light Black Wagon Wheel, Industrial Farmhouse Dining Room ", "cat": "Lighting", "qty": 1, "fob": 40.0, "retail": 259.0, "comp_fob": 32.38}, {"sku": "1010070640", "title": "Maverick 9-Light Black Tiered Candle Chandelier Light Fixture", "cat": "Chandeliers", "qty": 25, "fob": 14.0, "retail": 89.97, "comp_fob": 11.33}, {"sku": "1008852513", "title": "Moritz 6-Light Matte Black Shaded Pendant Light with Clear Glass Shade", "cat": "Outdoor Hanging Lights", "qty": 48, "fob": 25.0, "retail": 212.0, "comp_fob": 20.24}, {"sku": "96057-0", "title": "Kohler Highcliff Ultra-ADA-Height Elongated Flushometer Toilet Bowl On", "cat": "Toilet Bowls", "qty": 6, "fob": 30.0, "retail": 180.3, "comp_fob": 24.29}, {"sku": "736916715843", "title": "12-Light Gold Finish Swooped Arm Hanging Chandelier Light Fixture", "cat": "Lighting", "qty": 3, "fob": 55.0, "retail": 372.64, "comp_fob": 44.53}, {"sku": "122317", "title": "Montauk Black Slate Rectangle 12 in. x 24 in. Natural Textured Stone L", "cat": "Tile", "qty": 125, "fob": 5.0, "retail": 39.9, "comp_fob": 4.05}, {"sku": "1000035351", "title": "Portland Stone Gray 18 in. x 18 in. Glazed Ceramic Floor and Wall Tile", "cat": "Tile", "qty": 18, "fob": 5.0, "retail": 17.26, "comp_fob": 4.05}, {"sku": "1002076139", "title": "Vigo Beige 12 in. x 24 in. Matte Ceramic Stone Look Floor and Wall Til", "cat": "Tile", "qty": 52, "fob": 5.0, "retail": 14.22, "comp_fob": 4.05}, {"sku": "1006367442", "title": "Alexandra White 12 in. x 24 in. Matte Porcelain Marble Look Floor and ", "cat": "Tile", "qty": 56, "fob": 5.0, "retail": 27.02, "comp_fob": 4.05}, {"sku": "1002671564", "title": "Restore Bright White 3 in. x 6 in. Glossy Ceramic Subway Wall Tile (12", "cat": "Flooring", "qty": 100, "fob": 4.0, "retail": 14.98, "comp_fob": 3.24}, {"sku": "1003079025", "title": "Kolasus White 12 in. x 24 in. Polished Porcelain Marble Look Floor and", "cat": "Tile", "qty": 53, "fob": 6.0, "retail": 43.02, "comp_fob": 4.86}, {"sku": "1002820802", "title": "Nova Falls Gray 12 in. x 24 in. Porcelain Stone Look Floor and Wall Ti", "cat": "Tile", "qty": 11, "fob": 4.0, "retail": 27.91, "comp_fob": 3.24}, {"sku": "1006544256", "title": "Crystal Bianco 32 in. x 32 in. Polished Porcelain Marble Look Floor an", "cat": "Tile", "qty": 21, "fob": 10.0, "retail": 63.76, "comp_fob": 8.1}, {"sku": "1005401943", "title": "Impero Black Matte 12 in. x 24 in. Marble Look Porcelain Floor and Wal", "cat": "Tile", "qty": 21, "fob": 5.0, "retail": 33.92, "comp_fob": 4.05}, {"sku": "1002704347", "title": "Restore 3 in. x 12 in. Ceramic Bright White Subway Tile (12 sq. ft. /C", "cat": "Tile", "qty": 30, "fob": 5.0, "retail": 33.46, "comp_fob": 4.05}, {"sku": "1003332541", "title": "Carrara Polished Marble Look Porcelain Tile 24 in. x 24 in., Floor and", "cat": "Flooring", "qty": 40, "fob": 8.0, "retail": 31.82, "comp_fob": 6.48}, {"sku": "1003079037", "title": "Kolasus White Matte White Stone Look Porcelain Kitchen and Bathroom Re", "cat": "Porcelain Tile", "qty": 41, "fob": 5.0, "retail": 31.84, "comp_fob": 4.05}, {"sku": "1007546509", "title": "Rorington Taupe 12 in. x 24 in. Glazed Porcelain Floor and Wall Tile (", "cat": "Tile", "qty": 60, "fob": 5.0, "retail": 22.68, "comp_fob": 4.05}, {"sku": "1001509625", "title": "Ready-to-Assemble 28 in. W x 32 in. H x 18 in. D 2-Door Steel Garage B", "cat": "Storage & Organization", "qty": 6, "fob": 75.0, "retail": 270.63, "comp_fob": 60.72}, {"sku": "846212024966", "title": "Husky C602H 60 Gallon Stationary Electric Air Compressor", "cat": "Air Compressors", "qty": 2, "fob": 400.0, "retail": 899.0, "comp_fob": 323.83}, {"sku": "1010619913", "title": "*Store Display Box* Conyer 20 in. Indoor/Wet Outdoor 3-Speed Anywhere ", "cat": "", "qty": 16, "fob": 20.0, "retail": 99.0, "comp_fob": 16.19}, {"sku": "1008718390", "title": "Drakewood 26 in. Natural Wood Tripod Table Lamp", "cat": "Lighting", "qty": 36, "fob": 12.0, "retail": 79.97, "comp_fob": 9.71}, {"sku": "1008749885", "title": "*Store Display Box* Scenic 52 in. Integrated LED Indoor Brushed Nickel", "cat": "Lighting", "qty": 12, "fob": 25.0, "retail": 99.0, "comp_fob": 20.24}, {"sku": "1013882148", "title": "24 in. KESTLE 3-Light Black Vanity Light with Night Light Mode, E26 In", "cat": "Vanity Lighting", "qty": 1215, "fob": 10.0, "retail": 89.97, "comp_fob": 8.1}, {"sku": "1003991716", "title": "36 in. W Under Cabinet Range Hood in Stainless Steel", "cat": "Appliances", "qty": 21, "fob": 60.0, "retail": 299.0, "comp_fob": 48.57}, {"sku": "1008339516", "title": "26 in. Ceramic Rectangular Vessel Bathroom Sink in White", "cat": "Bathroom Sinks", "qty": 103, "fob": 15.0, "retail": 93.55, "comp_fob": 12.14}, {"sku": "1008339522", "title": "16 in. Ceramic Round Vessel Bathroom Sink in White", "cat": "Bathroom Sinks", "qty": 268, "fob": 10.0, "retail": 71.3, "comp_fob": 8.1}, {"sku": "1005485166", "title": "15 in  Telecommunication Center", "cat": "Electrical", "qty": 200, "fob": 7.0, "retail": 59.98, "comp_fob": 5.67}, {"sku": "1003002881", "title": "Husky Adjustable Plumbers Wrench", "cat": "Tools", "qty": 1200, "fob": 3.0, "retail": 15.97, "comp_fob": 2.43}, {"sku": "1006858101", "title": "Ryobi 40V HP Brushless EZClean 600 PSI 0.7 GPM Cordless Battery Cold W", "cat": "Outdoor Power Equipment", "qty": 66, "fob": 75.0, "retail": 199.0, "comp_fob": 60.72}, {"sku": "1007581894", "title": "Zero Radius 15 in. Undermount 18G Gunmetal Black Stainless Steel Singl", "cat": "Kitchen Sinks", "qty": 36, "fob": 60.0, "retail": 295.1, "comp_fob": 48.57}, {"sku": "1004500374", "title": "Denver White Painted Stock Assembled Wall Kitchen Cabinet W4236 (42 in", "cat": "Kitchen Cabinets", "qty": 13, "fob": 50.0, "retail": 355.0, "comp_fob": 40.48}, {"sku": "950235", "title": "Metro Gris Matte Smooth Gray Stone Look Porcelain Rectangle Tile 12 in", "cat": "Tile", "qty": 32, "fob": 8.0, "retail": 31.84, "comp_fob": 6.48}, {"sku": "1001402653", "title": "Strata 12 in. x 24 in. Matte Ceramic Marble Look Floor and Wall Tile (", "cat": "Flooring", "qty": 31, "fob": 5.0, "retail": 22.22, "comp_fob": 4.05}, {"sku": "1002695602", "title": "Vigoro Salerno 24 in. H x 24 in. W Metal Garden Fence", "cat": "Vigoro Garden Fencing", "qty": 336, "fob": 2.0, "retail": 14.98, "comp_fob": 1.62}, {"sku": "586700", "title": "36 in. Horse-Trough Replacement Planter Liner", "cat": "Plant Pots", "qty": 3084, "fob": 0.5, "retail": 8.99, "comp_fob": 0.4}, {"sku": "1005526333", "title": "Husky Heavy Duty 56in 18-Drawer Tool Chest, Black [ Top Half Only ]", "cat": "Tool Storage", "qty": 29, "fob": 250.0, "retail": 589.0, "comp_fob": 202.39}, {"sku": "1005315141", "title": "49 in. W x 22 in. D Cultured Marble White Rectangular Single Sink Vani", "cat": "Bathroom Vanities", "qty": 2, "fob": 75.0, "retail": 499.0, "comp_fob": 60.72}, {"sku": "1005496879", "title": "Cambridge Shaker Assembled 36 in. x 18 in. x 24.5 in. Refrigerator Wal", "cat": "Kitchen Cabinets", "qty": 4, "fob": 46.0, "retail": 306.95, "comp_fob": 37.24}, {"sku": "1005496886", "title": "Cambridge Gray Shaker Assembled Base Kitchen Cabinet with 3-Soft Close", "cat": "Kitchen Cabinets", "qty": 1, "fob": 100.0, "retail": 705.2, "comp_fob": 80.96}, {"sku": "1005496830", "title": "Cambridge Gray Shaker Assembled Corner Cabinet (24 in. W x 24.5 in. D ", "cat": "Kitchen Cabinets", "qty": 1, "fob": 44.0, "retail": 292.58, "comp_fob": 35.62}, {"sku": "888422310637", "title": "Arlington Veiled Gray Plywood Shaker Stock Assembled Wall Kitchen Cabi", "cat": "Kitchen Cabinets", "qty": 68, "fob": 30.0, "retail": 198.0, "comp_fob": 24.29}, {"sku": "888422244673", "title": "Arlington Veiled Gray Plywood Shaker Assembled Vanity Sink Base Kitche", "cat": "Kitchen Cabinets", "qty": 41, "fob": 95.0, "retail": 629.53, "comp_fob": 76.91}, {"sku": "888422244727", "title": "Arlington 15 in W x 21 in D x 34.5 in H in Veiled Gray Assembled Plywo", "cat": "Kitchen Cabinets", "qty": 22, "fob": 70.0, "retail": 484.03, "comp_fob": 56.67}, {"sku": "1001809259", "title": "Brushed Nickel Steel Square Curtain Rod Finial (Set of 2)", "cat": "Curtain Rod Finials", "qty": 224, "fob": 2.0, "retail": 12.77, "comp_fob": 1.62}, {"sku": "1011184413", "title": "Holiday Sparkle Ornament Iridescent Ribbons Archway 8.6-ft H x 9.75 ft", "cat": "Christmas Decorations", "qty": 13, "fob": 40.0, "retail": 198.98, "comp_fob": 32.38}, {"sku": "1013162022", "title": "Sinclair 17.5 in. W x 29.37 in. H x 0.75 in. D Kitchen Cabinet Wall De", "cat": "Kitchen Cabinets", "qty": 32, "fob": 7.0, "retail": 54.0, "comp_fob": 5.67}, {"sku": "888422311177", "title": "Richmond Vesuvius Gray Plywood Shaker Wall Kitchen Cabinet  21 in W x ", "cat": "Kitchen Cabinets", "qty": 129, "fob": 30.0, "retail": 217.94, "comp_fob": 24.29}, {"sku": "1006774483", "title": "Richmond Vesuvius Gray Plywood Shaker Stock Ready to Assemble Wall Kit", "cat": "In Stock Kitchen Cabinets", "qty": 282, "fob": 45.0, "retail": 313.33, "comp_fob": 36.43}, {"sku": "1006666384", "title": "Arlington Velied Gray Plywood Shaker Stock Assembled Wall Kitchen Cabi", "cat": "Kitchen Cabinets", "qty": 22, "fob": 35.0, "retail": 249.0, "comp_fob": 28.34}, {"sku": "1011921000", "title": "Low-Voltage 300-Watt Metal Landscape Lighting Transformer with Dusk to", "cat": "Outdoor Lighting", "qty": 9280, "fob": 10.0, "retail": 129.0, "comp_fob": 8.1}, {"sku": "258474", "title": "PL 500 Landscape Block 10 oz. Solvent Construction Adhesive Tan Cartri", "cat": "General Purpose Construction Adhesive", "qty": 70, "fob": 1.0, "retail": 6.48, "comp_fob": 0.81}, {"sku": "318248", "title": "PL 500 Landscape Block 28 oz. Solvent Construction Adhesive Tan Cartri", "cat": "Specialty Construction Adhesive", "qty": 72, "fob": 2.0, "retail": 10.48, "comp_fob": 1.62}, {"sku": "1008665116", "title": "Home Decorators Collection Hampton 62 in. Black Buffet", "cat": "Kitchen & Dining Room Furniture", "qty": 3, "fob": 75.0, "retail": 499.5, "comp_fob": 60.72}, {"sku": "1003382575", "title": "2-Pack 2 ft. x 4 ft. White Integrated LED Flat Panel Troffer Light Fix", "cat": "Lighting", "qty": 40, "fob": 15.0, "retail": 97.41, "comp_fob": 12.14}, {"sku": "1005591772", "title": "Husky 26 in. W x 16 in. D Standard Duty 5-Drawer Top Tool Chest in Tex", "cat": "Tool Storage", "qty": 19, "fob": 125.0, "retail": 298.0, "comp_fob": 101.2}, {"sku": "1000018585", "title": "448 oz. Yellow Fast Grab FRP Construction Adhesive Pail", "cat": "Paint Supplies", "qty": 77, "fob": 15.0, "retail": 74.98, "comp_fob": 12.14}, {"sku": "1013533442", "title": "Cream Cordless Blackout Vinyl Roller Window Shade 55.25 in. W x 72 in.", "cat": "Window Shades", "qty": 36, "fob": 5.0, "retail": 59.98, "comp_fob": 4.05}, {"sku": "1008854453", "title": "Paskay 18 in. 3-Light Black Drum Pendant Light Fixture with Fabric Sha", "cat": "Pendant Lights", "qty": 80, "fob": 17.0, "retail": 119.0, "comp_fob": 13.76}, {"sku": "888422311450", "title": "Richmond Vesuvius Gray Plywood Shaker Assembled Kitchen Cabinet Filler", "cat": "Building Materials", "qty": 36, "fob": 5.0, "retail": 80.0, "comp_fob": 4.05}, {"sku": "1006865860", "title": "56V Brushless Cordless Battery Attachment Capable 16 in. String Trimme", "cat": "Electric String Trimmers", "qty": 42, "fob": 120.0, "retail": 269.0, "comp_fob": 97.15}, {"sku": "1008854449", "title": "Croyden 3-Light Black Caged Candle Chandelier Light Fixture with Metal", "cat": "Chandeliers", "qty": 415, "fob": 15.0, "retail": 159.0, "comp_fob": 12.14}, {"sku": "1014869714", "title": "1-Pack 24in. Wall Mounted Towel Bar in Chrome", "cat": "Bathroom Accessories", "qty": 10, "fob": 1.0, "retail": 6.48, "comp_fob": 0.81}, {"sku": "888422309259", "title": "Richmond Verona White Plywood Shaker Assembled Kitchen Cabinet Filler ", "cat": "Building Materials", "qty": 80, "fob": 5.0, "retail": 80.0, "comp_fob": 4.05}, {"sku": "1002698647", "title": "Chestnut Cordless Premium Faux Wood blinds with 2.5 in. Slats - 66 in.", "cat": "Blinds", "qty": 8, "fob": 10.0, "retail": 134.0, "comp_fob": 8.1}, {"sku": "1004849749", "title": "21.2 cc Gas 2-Stroke Straight Shaft String Trimmer with High Torque Ge", "cat": "Gas String Trimmers", "qty": 2, "fob": 157.0, "retail": 349.0, "comp_fob": 127.1}, {"sku": "1007085752", "title": "8.25 in. Fitter Matte Black Metal Square Lantern Pendant Lamp Shade", "cat": "Globes & Shades", "qty": 64, "fob": 5.0, "retail": 32.97, "comp_fob": 4.05}, {"sku": "1008868605", "title": "Tight Radius 36 in. Undermount 50/50 Double Bowl 18 Gauge Stainless St", "cat": "Kitchen", "qty": 108, "fob": 74.0, "retail": 370.6, "comp_fob": 59.91}, {"sku": "1011504299", "title": "Ludlow Low Voltage Black Hardwired LED Weather Resistant Path Light Wi", "cat": "Outdoor Lighting", "qty": 1, "fob": 6.0, "retail": 39.97, "comp_fob": 4.86}, {"sku": "179418", "title": "25 ft. RG-6 Quad Shielded Coaxial Cable", "cat": "Electrical Cords", "qty": 480, "fob": 3.0, "retail": 27.88, "comp_fob": 2.43}, {"sku": "180771", "title": "3 ft. RG-6 Coaxial Cable - Black", "cat": "Cables", "qty": 812, "fob": 1.0, "retail": 9.97, "comp_fob": 0.81}, {"sku": "1002233262", "title": "3 ft. Standard HDMI Cable", "cat": "Electrical", "qty": 78, "fob": 1.0, "retail": 6.98, "comp_fob": 0.81}, {"sku": "575698", "title": "15 ft. CAT5e UTP Ethernet Cable, Yellow", "cat": "Ethernet Cables", "qty": 10, "fob": 1.0, "retail": 8.0, "comp_fob": 0.81}, {"sku": "180276", "title": "6 ft. RG-6 Coaxial Cable - Black", "cat": "Electrical", "qty": 12, "fob": 3.0, "retail": 19.97, "comp_fob": 2.43}, {"sku": "190242", "title": "White 1-Gang Phone Jack Wall Plate (1-Pack)", "cat": "Wall Plates", "qty": 180, "fob": 1.0, "retail": 5.47, "comp_fob": 0.81}, {"sku": "187635", "title": "Almond 1-Gang Phone Jack Wall Plate (1-Pack)", "cat": "Electrical", "qty": 20, "fob": 1.0, "retail": 5.28, "comp_fob": 0.81}, {"sku": "1007053741", "title": "Southbourne 28 in. 4-Light Matte Black Vanity Light with Open Steel Ca", "cat": "Lighting", "qty": 1, "fob": 15.0, "retail": 99.97, "comp_fob": 12.14}, {"sku": "1006865859", "title": "ECHO 56V 16 in. Brushless Cordless Battery Straight Shaft String Trimm", "cat": "Outdoor Power Equipment", "qty": 2, "fob": 112.0, "retail": 249.0, "comp_fob": 90.67}, {"sku": "1001509802", "title": "Low-Voltage 120-Watt Landscape Lighting Transformer with Dusk to Dawn ", "cat": "Lighting", "qty": 360, "fob": 10.0, "retail": 74.97, "comp_fob": 8.1}, {"sku": "1002949638", "title": "Home Decorators Collection Prescott Polar White Open Top Pantry 995060", "cat": "Kitchen & Dining Room Furniture", "qty": 53, "fob": 47.0, "retail": 314.6, "comp_fob": 38.05}, {"sku": "1011921004", "title": "Low Voltage 200W Digital Landscape Lighting Transformer", "cat": "Outdoor Lighting", "qty": 740, "fob": 10.0, "retail": 79.97, "comp_fob": 8.1}, {"sku": "1008133461", "title": "charcoal upholstery platform king", "cat": "Beds", "qty": 14, "fob": 71.0, "retail": 474.5, "comp_fob": 57.48}, {"sku": "1008245253", "title": "40V HP Brushless Whisper Series 21 in. Single-Stage Cordless Battery S", "cat": "Outdoor Power Equipment", "qty": 1, "fob": 320.0, "retail": 799.0, "comp_fob": 259.06}, {"sku": "1002949901", "title": "Home Decorators Collection Provence Ivory Writing Desk with Ash Brown ", "cat": "Home Office Furniture", "qty": 1, "fob": 38.0, "retail": 249.5, "comp_fob": 30.76}, {"sku": "1005725074", "title": "Home Decorators Collection Reflections Espresso Brown Console Table", "cat": "Living Room Furniture", "qty": 2, "fob": 42.0, "retail": 279.65, "comp_fob": 34.0}, {"sku": "1002949636", "title": "Home Decorators Collection Prescott Polar White Open Top Pantry 995060", "cat": "Kitchen & Dining Room Furniture", "qty": 2, "fob": 48.0, "retail": 314.66, "comp_fob": 38.86}, {"sku": "1002959135", "title": "Home Decorators Collection Shutter Worn Black Hall Tree", "cat": "Entryway Furniture", "qty": 1, "fob": 66.0, "retail": 439.5, "comp_fob": 53.43}, {"sku": "650531912633", "title": "Drop-in Stainless Steel 25 in. 4-Hole Single Basin Kitchen Sink", "cat": "Kitchen", "qty": 1, "fob": 140.0, "retail": 700.0, "comp_fob": 113.34}, {"sku": "XCVO6Z", "title": "Makita XCV06Z 18V Cordless Vacuum Cleaner (Tool Only)", "cat": "Cleaning", "qty": 1, "fob": 150.0, "retail": 499.0, "comp_fob": 121.44}, {"sku": "046396013446", "title": "Echo CHT-58VBT 58V Lithium-Ion Brushless Cordless Battery Hedge Trimme", "cat": "Outdoor Power Equipment", "qty": 1, "fob": 100.0, "retail": 253.19, "comp_fob": 80.96}, {"sku": "1005190763", "title": "8,000 BTU 115-Volt Through-the-Wall Air Conditioner Unit Cools 350 sq.", "cat": "Heating, Venting & Cooling", "qty": 1, "fob": 150.0, "retail": 579.0, "comp_fob": 121.44}, {"sku": "1004459930", "title": "Home Decorators Collection Burton 56 in. Chili Red Rectangle Wood Cons", "cat": "Living Room Furniture", "qty": 3, "fob": 45.0, "retail": 299.5, "comp_fob": 36.43}, {"sku": "1008974340", "title": "Brandywine Stainless Steel Project Pack", "cat": "Door Locks", "qty": 1, "fob": 6.0, "retail": 43.47, "comp_fob": 4.86}, {"sku": "1008665114", "title": "Home Decorators Collection Hampton Gray Buffet", "cat": "Kitchen & Dining Room Furniture", "qty": 2, "fob": 54.0, "retail": 364.5, "comp_fob": 43.72}, {"sku": "1005969203", "title": "Home Decorators Collection Cliffmore White Glass Door Buffet with Elli", "cat": "Kitchen & Dining Room Furniture", "qty": 6, "fob": 40.0, "retail": 264.5, "comp_fob": 32.38}, {"sku": "1006970592", "title": "Home Decorators Collection Chennai Whitewash King Bed", "cat": "Panel Beds", "qty": 87, "fob": 105.0, "retail": 2100.0, "comp_fob": 85.01}, {"sku": "1008805678", "title": "Big Ass Fans 4900 Series 168 in. Variable Speed Indoor Ceiling Fan Wal", "cat": "Ceiling Fans", "qty": 15, "fob": 3150.0, "retail": 4449.0, "comp_fob": 2550.17}, {"sku": "1007952860", "title": "Rosebrook 7-Piece Wicker Outdoor Dining Set with CushionGuard Plus Fla", "cat": "Furniture", "qty": 1, "fob": 500.0, "retail": 1735.0, "comp_fob": 404.79}, {"sku": "1005614292", "title": "Laurel Oaks 7-Piece Dark Brown Steel Outdoor Patio *CHAIRS ONLY* (2 sw", "cat": "Patio Dining Sets", "qty": 2, "fob": 125.0, "retail": 499.0, "comp_fob": 101.2}, {"sku": "1006931042", "title": "41 in 16-Drawer Tool Chest And Cabinet Set, Red ( Top Half Only )", "cat": "Tool Chests", "qty": 8, "fob": 100.0, "retail": 249.0, "comp_fob": 80.96}];
+
+const DUTIES=[
+  {label:'20% — Muebles (HS 94)',val:0.20},
+  {label:'16% — Iluminación / Luminarias',val:0.16},
+  {label:'14% — Herramientas (HS 82)',val:0.14},
+  {label:'12% — Electrónica (HS 85)',val:0.12},
+  {label:'18% — Textil hogar (HS 63)',val:0.18},
+  {label:'20% — Ferretería (HS 73)',val:0.20},
+  {label:'16% — Cerámica / Pisos (HS 69)',val:0.16},
+  {label:'10% — Maquinaria (HS 84)',val:0.10},
+  {label:'14% — Ventiladores / Clima',val:0.14},
+  {label:'20% — Grifería / Sanitarios',val:0.20},
+  {label:'Personalizado',val:-1},
+];
+
+// ── STATE ──
+let products=[], pid=0;
+let catFilter='', catOpen=false;
+
+// ── CONFIG ──
+const $=id=>document.getElementById(id);
+const fv=id=>parseFloat($(id).value)||0;
+
+function updConfig(){
+  const fpu=(fv('c-cont')/Math.max(1,fv('c-units'))).toFixed(2);
+  $('c-fpu').textContent='$'+fpu;
+}
+
+// ── CATALOG PANEL ──
+function toggleCatalog(){
+  catOpen=!catOpen;
+  $('cat-panel').style.display=catOpen?'block':'none';
+  const btn=$('cat-btn');
+  btn.textContent=catOpen?'✕ Cerrar catálogo':'📦 Cargar desde catálogo';
+  btn.classList.toggle('cat-open',catOpen);
+  if(catOpen) renderCatalogList();
+}
+
+function filterCatalog(){
+  catFilter=$('cat-search').value.toLowerCase();
+  renderCatalogList();
+}
+
+function renderCatalogList(){
+  const data=CATALOG.filter(p=>{
+    if(!catFilter) return true;
+    return p.title.toLowerCase().includes(catFilter)||
+           p.sku.includes(catFilter)||
+           p.cat.toLowerCase().includes(catFilter);
+  });
+  const list=$('cat-list');
+  if(!data.length){list.innerHTML='<div class="cat-empty">No se encontraron productos.</div>';return;}
+  const shown=data.slice(0,80);
+  list.innerHTML=shown.map(p=>`
+    <div class="cat-item" onclick="loadFromCatalog('${p.sku}')">
+      <div class="cat-item-info">
+        <div class="cat-item-name">${p.title}</div>
+        <div class="cat-item-meta">${p.cat} · SKU ${p.sku}</div>
+      </div>
+      <div class="cat-item-qty">${p.qty} uds</div>
+      <div class="cat-item-fob">$${p.fob}</div>
+    </div>`).join('')+
+    (data.length>80?`<div class="cat-empty">${data.length-80} más — refiná la búsqueda</div>`:'');
+}
+
+function loadFromCatalog(sku){
+  const p=CATALOG.find(x=>x.sku===sku);
+  if(!p) return;
+  // Pick duty based on category
+  let dutyIdx=0;
+  const cat=p.cat.toLowerCase();
+  if(cat.includes('light')||cat.includes('sconce')||cat.includes('pendant')||cat.includes('chandelier')) dutyIdx=1;
+  else if(cat.includes('tool')) dutyIdx=2;
+  else if(cat.includes('ceiling fan')||cat.includes('heating')||cat.includes('cool')) dutyIdx=8;
+  else if(cat.includes('tile')||cat.includes('floor')||cat.includes('ceramic')) dutyIdx=6;
+  else if(cat.includes('sink')||cat.includes('bath')||cat.includes('toilet')||cat.includes('faucet')) dutyIdx=9;
+  else if(cat.includes('kitchen cabinet')||cat.includes('furniture')) dutyIdx=0;
+  else if(cat.includes('electrical')) dutyIdx=3;
+  addProduct(p.title, p.sku, p.fob, Math.min(p.qty,50)||1, dutyIdx);
+}
+
+function loadAllVisible(){
+  const data=CATALOG.filter(p=>{
+    if(!catFilter) return true;
+    return p.title.toLowerCase().includes(catFilter)||
+           p.sku.includes(catFilter)||
+           p.cat.toLowerCase().includes(catFilter);
+  }).slice(0,20);
+  data.forEach(p=>loadFromCatalog(p.sku));
+  if(catOpen) toggleCatalog();
+}
+
+// ── PRODUCTS ──
+function addProduct(name='',sku='',fob='',qty=1,dutyIdx=0){
+  const id=pid++;
+  products.push({id,name,sku,fob:fob||'',qty,dutyIdx,customDuty:20});
+  renderRows();
+  recalc();
+}
+
+function removeProduct(id){
+  products=products.filter(p=>p.id!==id);
+  renderRows();
+  recalc();
+}
+
+function updateField(id,field,val){
+  const p=products.find(x=>x.id===id);
+  if(!p) return;
+  if(field==='fob'||field==='customDuty') p[field]=parseFloat(val)||0;
+  else if(field==='qty') p[field]=parseInt(val)||1;
+  else if(field==='dutyIdx') p[field]=parseInt(val)||0;
+  else p[field]=val;
+  recalc();
+}
+
+function renderRows(){
+  const tbody=$('product-rows');
+  $('empty-msg').style.display=products.length?'none':'block';
+  tbody.innerHTML=products.map(p=>{
+    const dutyOpts=DUTIES.map((d,i)=>`<option value="${i}"${i===p.dutyIdx?' selected':''}>${d.label}</option>`).join('');
+    const isCustom=DUTIES[p.dutyIdx].val<0;
+    return `<tr id="row-${p.id}">
+      <td><input class="ti" type="text" value="${p.name}" placeholder="Nombre del producto" oninput="updateField(${p.id},'name',this.value)" style="font-size:12px"></td>
+      <td class="c"><input class="ti mono" type="text" value="${p.sku}" placeholder="SKU" oninput="updateField(${p.id},'sku',this.value)" style="width:90px;text-align:center;font-size:11px"></td>
+      <td class="r">
+        <div style="position:relative;display:inline-flex;align-items:center">
+          <span style="position:absolute;left:8px;font-size:11px;color:var(--w30);font-family:'DM Mono',monospace;pointer-events:none">$</span>
+          <input class="ti mono" type="number" min="0" step="0.5" value="${p.fob}" placeholder="0.00" oninput="updateField(${p.id},'fob',this.value)" style="padding-left:18px;width:85px;text-align:right">
+        </div>
+      </td>
+      <td class="c"><input class="ti mono" type="number" min="1" value="${p.qty}" oninput="updateField(${p.id},'qty',this.value)" style="width:60px;text-align:center"></td>
+      <td class="c">
+        <div style="display:flex;flex-direction:column;gap:4px;align-items:center">
+          <select class="duty-sel" onchange="updateField(${p.id},'dutyIdx',this.value)">${dutyOpts}</select>
+          ${isCustom?`<input class="ti mono" type="number" min="0" max="100" step="0.5" value="${p.customDuty}" oninput="updateField(${p.id},'customDuty',this.value)" style="width:70px;text-align:center" placeholder="%">`:''}</div>
+      </td>
+      <td class="r"><span class="mn b" id="cif-${p.id}">—</span></td>
+      <td class="r"><span class="mn g" id="lnd-${p.id}">—</span></td>
+      <td class="r"><span class="mn w" id="tot-${p.id}">—</span><div class="sub" id="mult-${p.id}"></div></td>
+      <td class="c"><button class="del-btn" onclick="removeProduct(${p.id})">×</button></td>
+    </tr>`;
+  }).join('');
+}
+
+// ── CALC ──
+function calcProduct(p){
+  const fob=parseFloat(p.fob)||0;
+  const qty=parseInt(p.qty)||1;
+  const contUnits=Math.max(1,fv('c-units'));
+  const fpu=fv('c-cont')/contUnits;
+  const thcPU=fv('c-thc')/contUnits;
+  const storagePU=(fv('c-storage-days')*fv('c-storage-rate'))/contUnits;
+  const transportOn=$('c-transport-on').checked;
+  const transportPU=transportOn?fv('c-transport')/contUnits:0;
+  const segRate=fv('c-seg')/100;
+  const brokerRate=fv('c-broker')/100;
+  const dutyVal=DUTIES[p.dutyIdx].val<0?p.customDuty/100:DUTIES[p.dutyIdx].val;
+
+  const ins=fob*segRate;
+  const cif=fob+fpu+ins;
+  const di=cif*dutyVal;
+  const te=cif*0.025;
+  const taxBase=cif+di+te;
+  const iva=taxBase*0.21;
+  const ivaAd=taxBase*0.105;
+  const gcias=taxBase*0.06;
+  const iibb=taxBase*0.03;
+  const broker=cif*brokerRate;
+  const landedPort=cif+di+te+iva+ivaAd+gcias+iibb+broker+thcPU+storagePU;
+  const landedStore=landedPort+transportPU;
+  const nr=cif+di+te+iva+broker+thcPU+storagePU+transportPU;
+  const rec=ivaAd+gcias+iibb;
+  return{fob,qty,ins,fpu,cif,di,te,taxBase,iva,ivaAd,gcias,iibb,broker,
+    thcPU,storagePU,transportPU,landedPort,landedStore,nr,rec,
+    dutyPct:dutyVal*100};
+}
+
+function fmt(n){return'$'+Math.abs(n).toFixed(2);}
+function fmtk(n){return'$'+Math.round(n).toLocaleString('es-AR');}
+
+function recalc(){
+  updConfig();
+  const transportOn=$('c-transport-on').checked;
+  const tgMg=fv('c-margin');
+  const grid=$('breakdown-grid');
+  const tw=$('totals-wrap');
+  if(!products.length){grid.innerHTML='';tw.style.display='none';return;}
+
+  let totFob=0,totFreight=0,totTaxes=0,totLanded=0,totNR=0;
+
+  products.forEach(p=>{
+    if(!parseFloat(p.fob)) return;
+    const d=calcProduct(p);
+    const final=transportOn?d.landedStore:d.landedPort;
+    const c=$(`cif-${p.id}`);const l=$(`lnd-${p.id}`);const t=$(`tot-${p.id}`);const m=$(`mult-${p.id}`);
+    if(c)c.textContent=fmt(d.cif);
+    if(l)l.textContent=fmt(final);
+    if(t)t.textContent=fmtk(final*d.qty);
+    if(m)m.textContent='×'+(final/d.fob).toFixed(2)+' FOB';
+    totFob+=d.fob*d.qty;
+    totFreight+=(d.fpu+d.ins)*d.qty;
+    totTaxes+=(d.di+d.te+d.iva+d.ivaAd+d.gcias+d.iibb)*d.qty;
+    totLanded+=final*d.qty;
+    totNR+=d.nr*d.qty;
+  });
+
+  const margins=[25,30,35,40,45,50];
+  grid.innerHTML=products.filter(p=>parseFloat(p.fob)>0).map(p=>{
+    const d=calcProduct(p);
+    const final=transportOn?d.landedStore:d.landedPort;
+    const T=n=>Math.max(0,Math.round(Math.min(n/final*100,100)));
+    const mgCards=margins.map(m=>{
+      const sp=final/(1-m/100);
+      return`<div class="mg-sc${m===tgMg?' rec':''}">
+        <div class="ms-pct">${m}%</div>
+        <div class="ms-price">${fmt(sp)}</div>
+      </div>`;
+    }).join('');
+    const label=p.name||`Producto ${p.id+1}`;
+    const skuLabel=p.sku?`SKU ${p.sku}`:'sin SKU';
+    const tranRow=transportOn?`<div class="bk-row">
+      <div class="bk-label">Transporte al comercio</div>
+      <div class="bk-bar-wrap"><div class="bk-bar" style="width:${T(d.transportPU)}%;background:#6b7280"></div></div>
+      <div class="bk-amt" style="color:var(--w50)">${fmt(d.transportPU)}</div>
+      <span class="tag tag-log">flete</span></div>`:'';
+    return`<div class="bk-card">
+      <div class="bk-head">
+        <div><div class="bk-title">${label}</div><div class="bk-sku">${skuLabel} · ${d.dutyPct.toFixed(0)}% DI</div></div>
+        <div style="text-align:right;font-size:11px;color:var(--w50)">${d.qty} uds<br><span style="font-size:10px;color:var(--w30)">${fmtk(final*d.qty)} total</span></div>
+      </div>
+      <div class="bk-body">
+        <div class="bk-row"><div class="bk-label"><b>FOB Miami</b></div><div class="bk-bar-wrap"><div class="bk-bar" style="width:${T(d.fob)}%;background:#378ADD"></div></div><div class="bk-amt" style="color:var(--bp)">${fmt(d.fob)}</div><span class="tag tag-log">origen</span></div>
+        <div class="bk-row"><div class="bk-label">Flete marítimo / u</div><div class="bk-bar-wrap"><div class="bk-bar" style="width:${T(d.fpu)}%;background:#6b7280"></div></div><div class="bk-amt" style="color:var(--w50)">${fmt(d.fpu)}</div><span class="tag tag-log">logística</span></div>
+        <div class="bk-row"><div class="bk-label">Seguro (${fv('c-seg')}%)</div><div class="bk-bar-wrap"><div class="bk-bar" style="width:${T(d.ins)}%;background:#6b7280"></div></div><div class="bk-amt" style="color:var(--w50)">${fmt(d.ins)}</div><span class="tag tag-log">logística</span></div>
+        <div class="bk-row" style="background:rgba(74,116,245,.05)"><div class="bk-label"><b>CIF Buenos Aires</b></div><div class="bk-bar-wrap"><div class="bk-bar" style="width:${T(d.cif)}%;background:#4a74f5"></div></div><div class="bk-amt" style="color:var(--bp)">${fmt(d.cif)}</div><span class="tag tag-log">base</span></div>
+        <div class="bk-row"><div class="bk-label">Arancel DI (${d.dutyPct.toFixed(0)}%)</div><div class="bk-bar-wrap"><div class="bk-bar" style="width:${T(d.di)}%;background:#f43f5e"></div></div><div class="bk-amt" style="color:var(--red)">${fmt(d.di)}</div><span class="tag tag-nr">perm.</span></div>
+        <div class="bk-row"><div class="bk-label">Tasa estadística TE (2.5%)</div><div class="bk-bar-wrap"><div class="bk-bar" style="width:${T(d.te)}%;background:#f43f5e"></div></div><div class="bk-amt" style="color:var(--red)">${fmt(d.te)}</div><span class="tag tag-nr">perm.</span></div>
+        <div class="bk-row"><div class="bk-label">IVA 21%</div><div class="bk-bar-wrap"><div class="bk-bar" style="width:${T(d.iva)}%;background:#f43f5e"></div></div><div class="bk-amt" style="color:var(--red)">${fmt(d.iva)}</div><span class="tag tag-nr">perm.</span></div>
+        <div class="bk-row"><div class="bk-label">IVA adicional 10.5%</div><div class="bk-bar-wrap"><div class="bk-bar" style="width:${T(d.ivaAd)}%;background:#10b981"></div></div><div class="bk-amt" style="color:var(--grn)">${fmt(d.ivaAd)}</div><span class="tag tag-rec">recup.</span></div>
+        <div class="bk-row"><div class="bk-label">Ganancias anticipo 6%</div><div class="bk-bar-wrap"><div class="bk-bar" style="width:${T(d.gcias)}%;background:#10b981"></div></div><div class="bk-amt" style="color:var(--grn)">${fmt(d.gcias)}</div><span class="tag tag-rec">recup.</span></div>
+        <div class="bk-row"><div class="bk-label">IIBB ingresos brutos 3%</div><div class="bk-bar-wrap"><div class="bk-bar" style="width:${T(d.iibb)}%;background:#10b981"></div></div><div class="bk-amt" style="color:var(--grn)">${fmt(d.iibb)}</div><span class="tag tag-rec">recup.</span></div>
+        <div class="bk-row"><div class="bk-label">Despachante (${fv('c-broker')}%)</div><div class="bk-bar-wrap"><div class="bk-bar" style="width:${T(d.broker)}%;background:#f43f5e"></div></div><div class="bk-amt" style="color:var(--red)">${fmt(d.broker)}</div><span class="tag tag-nr">perm.</span></div>
+        <div class="bk-row"><div class="bk-label">THC / Gastos portuarios</div><div class="bk-bar-wrap"><div class="bk-bar" style="width:${T(d.thcPU)}%;background:#6b7280"></div></div><div class="bk-amt" style="color:var(--w50)">${fmt(d.thcPU)}</div><span class="tag tag-log">puerto</span></div>
+        <div class="bk-row"><div class="bk-label">Almacenaje en puerto</div><div class="bk-bar-wrap"><div class="bk-bar" style="width:${T(d.storagePU)}%;background:#6b7280"></div></div><div class="bk-amt" style="color:var(--w50)">${fmt(d.storagePU)}</div><span class="tag tag-log">puerto</span></div>
+        ${tranRow}
+        <div class="bk-total">
+          <div class="bk-total-row main"><span class="tl">💼 ${transportOn?'Puesto en tu comercio':'Nacionalizado en puerto'}</span><span class="tv">${fmt(final)}<small style="font-size:11px;color:var(--w30);margin-left:4px">/ u</small></span></div>
+          <div class="bk-total-row"><span class="tl">Costo real (sin recuperables)</span><span class="tv" style="color:var(--amb)">${fmt(d.nr)}</span></div>
+          <div class="bk-total-row"><span class="tl">Recuperable (crédito fiscal)</span><span class="tv" style="color:var(--grn)">+${fmt(d.rec)}</span></div>
+          <div class="bk-total-row"><span class="tl">Multiplicador sobre FOB</span><span class="tv" style="color:var(--w50)">×${(final/d.fob).toFixed(3)}</span></div>
+        </div>
+        <div class="bk-margin">
+          <div class="ml">Precio de venta según margen</div>
+          <div class="mg-scenarios">${mgCards}</div>
+        </div>
+      </div>
+    </div>`;
+  }).join('');
+
+  tw.style.display='block';
+  $('tot-fob').textContent=fmtk(totFob);
+  $('tot-freight').textContent=fmtk(totFreight);
+  $('tot-taxes').textContent=fmtk(totTaxes);
+  $('tot-landed').textContent=fmtk(totLanded);
+  $('tot-nr').textContent=fmtk(totNR);
+  $('tot-products').textContent=`${products.length} producto${products.length!==1?'s':''}`;
+}
+
+function clearAll(){products=[];pid=0;renderRows();recalc();}
+
+// ── INIT ──
+updConfig();
+renderRows();
+</script>
+</body>
+</html>
